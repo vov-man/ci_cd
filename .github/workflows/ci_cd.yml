@@ -1,86 +1,68 @@
 name: Django testing and deplooyment
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    django-tests:
-        runs-on: Ubuntu-22.04
+  django-tests:
+    runs-on: Ubuntu-22.04
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }} 
+      DEBUG: '0'
+      ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+      DB_ENGINE: ${{ secrets.DB_ENGINE }}
+      DB_NAME: ${{ secrets.DB_NAME}}
+      DB_USER: ${{ secrets.DB_USER}}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
+      DB_HOST: ${{ secrets.DB_HOST}}
+      DB_PORT: ${{ secrets.DB_PORT}}
+    services:
+      postgres_main:
+        image: postgres:14
         env:
-            SECRET_KEY: ${{ secrets.SECRET_KEY }} 
-            DEBUG: '0'
-            ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-            DB_ENGINE: ${{ secrets.DB_ENGINE }}
-            DB_NAME: ${{ secrets.DB_NAME}}
-            DB_USER: ${{ secrets.DB_USER}}
-            DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
-            DB_HOST: ${{ secrets.DB_HOST}}
-            DB_PORT: ${{ secrets.DB_PORT}}
-        services:
-            postgres_main:
-                image: postgres:14
-                env:
-                    POSTGRES_DB: ${{ env.DB_NAME}}
-                    POSTGRES_USER: ${{ env.DB_USER}}
-                    POSTGRES_PASSWORD: ${{ env.DB_PASSWORD}}
-                ports:
-                    - 5432:5432
-                options:
-                    -- health-cmd pg_isready
-                    -- health-interval 5s
-                    -- health-timeout 5s
-                    -- health-retries 5
-        
-        
-        steps:
-          - name: Installing python and the environment
-          uses: actions/setup-python@v4
-          with:
-              python-version: '3.10'
-          - name: Checking the repository for changes 
-          uses: actions/checkout@v4
+          POSTGRES_DB: ${{ env.DB_NAME}}
+          POSTGRES_USER: ${{ env.DB_USER}}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD}}
+        ports:
+          - 5432:5432
+        options:
+          -- health-cmd pg_isready
+          -- health-interval 5s
+          -- health-timeout 5s
+          -- health-retries 5
+  steps:
+    - name: checking the repository  
+      uses: actions/checkout@v4
 
-          
+    - name: installation python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+  
+    - name: Installing dependencies
+      run: pip install -r requiremens.txt        
 
-
-          - name: Installing dependencies
-                  run pip install -r requiremens.txt
-        
-
-          - name: Linting
-          run: flake8 logistic --exclude advertisements
-        
-
-          - name: Deploy
-          ses: appleboy/ssh-action@master
-          with:
-              host: ${{ secrets.SSH_HOST}}
-              username: ${{ secrets.SSH_USER}}
-              password: ${{ secrets.SSH_PASSWORD}}    
-            
-
-          - name: testing  
-          run: python3 manage.py test
-          env:
-              SECRET_KEY: ${{ env.SECRET_KEY }} 
-              DEBUG: ${{env.DEBUG}}
-              ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
-              DB_ENGINE: ${{ env.DB_ENGINE }}
-              DB_NAME: ${{ secrets.DB_NAME}}
-              DB_USER: ${{ secrets.DB_USER}}
-              DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
-              DB_HOST: ${{ secrets.DB_HOST}}
-              DB_PORT: ${{ secrets.DB_PORT}}
-        
-
-
-
-                            
-
-                
-
-
-
-
+    - name: Linting
+      run: flake8 logistic --exclude advertisements
+      
+    - name: testing  
+      run: python3 manage.py test
+      env:
+        SECRET_KEY: ${{ env.SECRET_KEY }} 
+        DEBUG: ${{env.DEBUG}}
+        ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
+        DB_ENGINE: ${{ env.DB_ENGINE }}
+        DB_NAME: ${{ secrets.DB_NAME}}
+        DB_USER: ${{ secrets.DB_USER}}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
+        DB_HOST: ${{ secrets.DB_HOST}}
+        DB_PORT: ${{ secrets.DB_PORT}}
+    
+    - name: 'Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST}}
+        username: ${{ secrets.SSH_USER}}
+        password: ${{ secrets.SSH_PASSWORD}}
