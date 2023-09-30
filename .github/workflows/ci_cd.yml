@@ -7,7 +7,7 @@ on:
 
 jobs:
     django-tests:
-        rus-on: Ubuntu-22.04
+        runs-on: Ubuntu-22.04
         env:
             SECRET_KEY: ${{ secrets.SECRET_KEY }} 
             DEBUG: '0'
@@ -32,46 +32,48 @@ jobs:
                     -- health-interval 5s
                     -- health-timeout 5s
                     -- health-retries 5
-            steps:
-                - name: Проверка репозитория на наличие изменений
-                uses: actions/checkout@v3
+        
+        
+        steps:
+          - name: Installing python and the environment
+          uses: actions/setup-python@v4
+          with:
+              python-version: '3.10'
+          - name: Checking the repository for changes 
+          uses: actions/checkout@v4
+
+          
 
 
-                - name: Установка python и окружения
-                uses: actions/setup-python@v3
-                with:
-                    python-version: '3.10'
+          - name: Installing dependencies
+                  run pip install -r requiremens.txt
+        
 
+          - name: Linting
+          run: flake8 logistic --exclude advertisements
+        
 
-                - name: Установка зависимостей 
-                        run pip install -r requiremens.txt
+          - name: Deploy
+          ses: appleboy/ssh-action@master
+          with:
+              host: ${{ secrets.SSH_HOST}}
+              username: ${{ secrets.SSH_USER}}
+              password: ${{ secrets.SSH_PASSWORD}}    
+            
 
-
-                - name: Линтинг
-                run: flake8 logistic --exclude advertisements
-                
-                
-                - name: тестирование    
-                run: python3 manage.py test
-                env:
-                    SECRET_KEY: ${{ env.SECRETS_KEY }} 
-                    DEBUG: ${{env.DEBUG}}
-                    ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
-                    DB_ENGINE: ${{ env.DB_ENGINE }}
-                    DB_NAME: ${{ secrets.DB_NAME}}
-                    DB_USER: ${{ secrets.DB_USER}}
-                    DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
-                    DB_HOST: ${{ secrets.DB_HOST}}
-                    DB_PORT: ${{ secrets.DB_PORT}}
-
-
-                - name: Деплой
-                uses: appleboy/ssh-action@master
-                with:
-                    host: ${{ secrets.SSH_HOST}}
-                    username: ${{ secrets.SSH_USER}}
-                    password: ${{ secrets.SSH_PASSWORD}}    
-                    script: 
+          - name: testing  
+          run: python3 manage.py test
+          env:
+              SECRET_KEY: ${{ env.SECRET_KEY }} 
+              DEBUG: ${{env.DEBUG}}
+              ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
+              DB_ENGINE: ${{ env.DB_ENGINE }}
+              DB_NAME: ${{ secrets.DB_NAME}}
+              DB_USER: ${{ secrets.DB_USER}}
+              DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
+              DB_HOST: ${{ secrets.DB_HOST}}
+              DB_PORT: ${{ secrets.DB_PORT}}
+        
 
 
 

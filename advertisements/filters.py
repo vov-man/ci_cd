@@ -8,4 +8,3 @@ class AdvertisementFilter(rest_framework.FilterSet):
     class Meta:
         model = Advertisement
         fields = ["created_at", "creator", "status"]
-        

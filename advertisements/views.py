@@ -6,16 +6,16 @@ from advertisements.serializers import AdvertisementSerializer
 from advertisements.models import Advertisement
 
 
-
 class AdvertisementViewSet(ModelViewSet):
     """ViewSet для объявлений."""
+
     queryset = Advertisement.objects.all()
     serializer_class = AdvertisementSerializer
-    filter_backends =  [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'updated_at']
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["status", "updated_at"]
+
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
-
 
     # TODO: настройте ViewSet, укажите атрибуты для кверисета,
     #   сериализаторов и фильтров
