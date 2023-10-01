@@ -13,57 +13,58 @@ jobs:
       DEBUG: '0'
       ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
       DB_ENGINE: ${{ secrets.DB_ENGINE }}
-      DB_NAME: ${{ secrets.DB_NAME}}
-      DB_USER: ${{ secrets.DB_USER}}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
-      DB_HOST: ${{ secrets.DB_HOST}}
-      DB_PORT: ${{ secrets.DB_PORT}}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
     services:
       postgres_main:
-        image: postgres:14
+        image: postgres:13
         env:
-          POSTGRES_DB: ${{ env.DB_NAME}}
-          POSTGRES_USER: ${{ env.DB_USER}}
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD}}
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
         ports:
           - 5432:5432
         options:
           -- health-cmd pg_isready
-          -- health-interval 5s
-          -- health-timeout 5s
+          -- health-interval 5sec
+          -- health-timeout 5sec
           -- health-retries 5
-  steps:
-    - name: checking the repository  
-      uses: actions/checkout@v4
+    steps:
+      - name: checking the repository  
+        uses: actions/checkout@v3
 
-    - name: installation python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10' 
-  
-    - name: Installing dependencies
-      run: pip install -r requiremens.txt        
-
-    - name: Linting
-      run: flake8 logistic --exclude advertisements
-      
-    - name: testing  
-      run: python3 manage.py test
-      env:
-        SECRET_KEY: ${{ env.SECRET_KEY }} 
-        DEBUG: ${{env.DEBUG}}
-        ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
-        DB_ENGINE: ${{ env.DB_ENGINE }}
-        DB_NAME: ${{ secrets.DB_NAME}}
-        DB_USER: ${{ secrets.DB_USER}}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
-        DB_HOST: ${{ secrets.DB_HOST}}
-        DB_PORT: ${{ secrets.DB_PORT}}
+      - name: installation python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9' 
     
-    - name: Deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST}}
-        username: ${{ secrets.SSH_USER}}
-        password: ${{ secrets.SSH_PASSWORD}}
+      - name: Installing dependencies
+        run: pip install -r requiremens.txt        
+
+      - name: Linting
+        run: flake8 logistic --exclude advertisements
         
+      - name: testing  
+        run: python3 manage.py test
+        env:
+          SECRET_KEY: ${{ env.SECRET_KEY }} 
+          DEBUG: ${{ env.DEBUG }}
+          ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
+          DB_ENGINE: ${{ env.DB_ENGINE }}
+          DB_NAME: ${{ env.DB_NAME }}
+          DB_USER: ${{ env.DB_USER }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+          DB_HOST: ${{ env.DB_HOST }}
+          DB_PORT: ${{ env.DB_PORT }}
+      
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script:
+          
