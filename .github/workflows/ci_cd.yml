@@ -29,9 +29,9 @@ jobs:
           - 5432:5432
         options:
           -- health-cmd pg_isready
-          -- health-interval-5sec
-          -- health-timeout-5sec
-          -- health-retries-5
+          -- health-interval 5s
+          -- health-timeout 5s
+          -- health-retries 5
     steps:
       - name: checking the repository  
         uses: actions/checkout@v3
