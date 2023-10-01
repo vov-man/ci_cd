@@ -1,4 +1,3 @@
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,6 +6,7 @@ from advertisements.serializers import AdvertisementSerializer
 from advertisements.models import Advertisement
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 
 class AdvertisementViewSet(ModelViewSet):
     """ViewSet для объявлений."""
@@ -28,6 +28,7 @@ class AdvertisementViewSet(ModelViewSet):
             return [IsAuthenticated()]
         return []
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def sample_view(request):
-    return Response ('Работает')
+    return Response("Работает")
