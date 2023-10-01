@@ -19,14 +19,14 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
     services:
-      mysql:
-        image: mysql:8.0
+      postgres_main:
+        image: postgres:13
         env:
           POSTGRES_DB: ${{ env.DB_NAME }}
           POSTGRES_USER: ${{ env.DB_USER }}
           POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
         ports:
-          - '5432:5432'
+          - 5432:5432
         options:
           -- health-cmd pg_isready
           -- health-interval 5s
