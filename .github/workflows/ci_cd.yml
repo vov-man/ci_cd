@@ -42,8 +42,8 @@ jobs:
           python-version: '3.9' 
     
       - name: Installing dependencies
-        run: pip install -r requiremens.txt
-        
+        run: pip install -r requirements.txt
+
       - name: Linting
         run: flake8 logistic --exclude advertisements
         
