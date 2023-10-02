@@ -22,10 +22,10 @@ from advertisements.views import AdvertisementViewSet, sample_view
 
 router = DefaultRouter()
 router.register("advertisements", AdvertisementViewSet)
-router.register("sample_view", sample_view)
+
 
 urlpatterns = [
     path("api/", include(router.urls)),
-    path("api/test", sample_view),
+    path ('api/test', sample_view),
     path("admin/", admin.site.urls),
 ] + router.urls
