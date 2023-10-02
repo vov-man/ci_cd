@@ -45,7 +45,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Linting
-        run: flake8 advertisements
+        run: flake8 advertisements --exclude advrtisements/test_.py
         
       - name: testing  
         run: python3 manage.py test

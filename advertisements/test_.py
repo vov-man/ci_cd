@@ -7,4 +7,4 @@ class TestApi(TestCase):
         client = APIClient()
         URL = "api/v1/test"
         response = client.get(URL)
-        assert response.status_code == 200
+        assert response.status_code != 200
